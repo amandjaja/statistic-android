@@ -6,6 +6,7 @@ def libraryGroupId = 'com.amandjaja'
 def libraryArtifactId = 'statistic'
 def libraryVersion = '0.0.1'
 
+group='com.github.amandjaja'
 android {
     compileSdkVersion 28
 
