@@ -225,7 +225,7 @@
 9. **OnSend** interface.
    
     ```java
-    package id.kiosku.statistic;
+    package com.amandjaja.statistic;
     
     public interface OnSend<T> {
        void onPrepare(T data);
