@@ -3,8 +3,8 @@ package com.amandjaja.statistic.demo;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.amandjaja.statistic.ContentProvider;
@@ -25,13 +25,14 @@ public class MainActivity extends AppCompatActivity {
             },10);
         }
 
+        StatisticManager.startSession();
+
         StatisticManager.createEvent()
                 .setType("application")
                 .setCategory("action")
                 .setName("open")
-                .setSuccess()
-                .putCustom("device_brand","Samsung")
-                .putCustom("device_type","S8Plus")
+                .setId(getPackageName())
+                .setOk()
                 .send();
 
         contentProvider = StatisticManager.createContent().withTimeout();
@@ -44,9 +45,11 @@ public class MainActivity extends AppCompatActivity {
                 .setCategory("account")
                 .setName("login")
                 .setType("google")
-                .setSuccess(false)
-                .setRejectionCode("")
-                .setRejectionMessage("")
+                .setId("silveriusdodi@gmail.com")
+                .setOk(0)
+                .setStatus("00")
+                .setStatusCode("XX")
+                .setStatusMessage("Fail")
                 .send();
     }
 
@@ -58,24 +61,18 @@ public class MainActivity extends AppCompatActivity {
         contentProvider.addData(
                 StatisticManager.createContent()
                         .setId(1).setType("test").setCategory("test").setAction("test")
-                        .putCustom("device_brand","Samsung")
-                        .putCustom("device_type","S8Plus")
                         .putCustom("custom","1")
                         .build()
         );
         contentProvider.addData(
                 StatisticManager.createContent()
                         .setId(2).setType("test").setCategory("test").setAction("test")
-                        .putCustom("device_brand","Samsung")
-                        .putCustom("device_type","S8Plus")
                         .putCustom("custom","2")
                         .build()
         );
         contentProvider.addData(
                 StatisticManager.createContent()
                         .setId(3).setType("test").setCategory("test").setAction("test")
-                        .putCustom("device_brand","Samsung")
-                        .putCustom("device_type","S8Plus")
                         .putCustom("custom","3")
                         .build()
         );
@@ -102,9 +99,8 @@ public class MainActivity extends AppCompatActivity {
                         .setType("application")
                         .setCategory("permission")
                         .setName("location_granted")
-                        .setSuccess()
-                        .putCustom("device_brand","Samsung")
-                        .putCustom("device_type","S8Plus")
+                        .setId(getPackageName())
+                        .setOk()
                         .send();
             }
         }

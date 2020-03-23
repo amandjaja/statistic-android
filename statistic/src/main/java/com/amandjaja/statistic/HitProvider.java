@@ -11,9 +11,9 @@ public class HitProvider extends Provider<HitData, HitProvider> {
     }
     @Override
     public void send() {
-        if(data.data.size()==0) StatisticManager.getInstance().send(data, StatisticManager.HIT);
+        if(data.data.size()==0) StatisticManager.getInstance().send(data);
         else{
-            StatisticManager.getInstance().send(data, StatisticManager.HIT_BULK, new OnSend<HitData>(){
+            StatisticManager.getInstance().send(data, new OnSend<HitData>(){
                 @Override
                 public void onPrepare(HitData data) {
 

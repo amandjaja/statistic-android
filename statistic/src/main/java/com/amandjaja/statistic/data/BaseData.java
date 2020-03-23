@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import org.joda.time.DateTime;
 import org.joda.time.Seconds;
+import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,26 +39,10 @@ public abstract class BaseData {
     public String userId;
 
     public String carrier;
-    @SerializedName("device_id")
-    public String deviceId;
-    @SerializedName("device_brand")
-    public String deviceBrand;
-    @SerializedName("device_type")
-    public String deviceType;
-    @SerializedName("device_version")
-    public String deviceVersion;
-    @SerializedName("device_res")
-    public String deviceRes;
-    public Double longitude;
-    public Double latitude;
-    @SerializedName("location_subadmin")
-    public String locationSubadmin;
-    @SerializedName("location_admin")
-    public String locationAdmin;
-    @SerializedName("location_country")
-    public String locationCountry;
-    @SerializedName("location_country_code")
-    public String locationCountryCode;
+    public Map<String,Object> device;
+    private Double latitude;
+    private Double longitude;
+    public Map<String,Object> location;
 
     @SerializedName("log_time")
     public String logTime;
@@ -74,9 +59,24 @@ public abstract class BaseData {
     public Map<String,Object> attributes;
     {
         data = new ArrayList<>();
+        device = new HashMap<>();
+        location = new HashMap<>();
         attributes = new HashMap<>();
-        logDate = DateTime.now().toString("yyyy-MM-dd");
-        logTime = DateTime.now().toString("HH:mm:ss");
+        logDate = ISODateTimeFormat.dateTime().print(DateTime.now());
+        logTime = logDate;
+    }
+
+    public void setLatlng(double lat, double lng){
+        this.latitude = lat;
+        this.longitude = lng;
+    }
+
+    public Double getLatitude(){
+        return this.latitude;
+    }
+
+    public Double getLongitude(){
+        return this.longitude;
     }
 
     public void triggerStart(){

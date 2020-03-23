@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class ContentData extends BaseData {
-    @SerializedName("id")
+    @SerializedName("cid")
     public String ID;
     public String type;
     public String category;

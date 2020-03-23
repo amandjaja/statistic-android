@@ -1,6 +1,9 @@
 package com.amandjaja.statistic;
 
 import android.content.Context;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.amandjaja.statistic.apis.StatisticAPI;
 import com.amandjaja.statistic.apis.receivers.GeneralApiReceiver;
@@ -14,9 +17,10 @@ import org.joda.time.Seconds;
 
 import java.util.concurrent.TimeUnit;
 
-import id.kiosku.tcx.TCX;
-import id.kiosku.tcx.TCXInterceptor;
+import id.kiosku.utils.CryptoDriver;
+import id.kiosku.utils.KUtility;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -27,30 +31,20 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class StatisticManager {
     private static StatisticManager manager;
     private Context context;
-    private TCX tcx;
+    private String url, key;
 
     public static void init(Context context){
-        init(context,(TCX)null);
+        init(context,"");
     }
 
-    public static void init(Context context, String url){
-        init(context, url, null);
+    public static void init(Context context, String key){
+        init(context, "", key);
     }
 
-    public static void init(Context context, TCX tcx){
-        StatisticManager.manager = new StatisticManager(context, tcx);
+    public static void init(Context context, String url, String key){
+        StatisticManager.manager = StatisticManager.with(context, url, key);
     }
 
-    public static void init(Context context, String url, TCX tcx) {
-        StatisticManager.manager = new StatisticManager(context, url, tcx);
-    }
-
-    public static final int HIT = 0;
-    public static final int HIT_CONTENT = 1;
-    public static final int HIT_EVENT = 2;
-    public static final int HIT_BULK = 3;
-    public static final int HIT_CONTENT_BULK = 4;
-    public static final int HIT_EVENT_BULK = 5;
     private Retrofit apis;
     public interface EventListener{
         void onResponse(GeneralApiReceiver response);
@@ -58,48 +52,61 @@ public class StatisticManager {
     }
 
     public StatisticManager(Context context){
-        this(context,(TCX)null);
+        this(context,"");
     }
-    public StatisticManager(Context context, TCX tcx){
-        this(context,context.getApplicationContext().getClass().getAnnotation(StatisticConfig.class).url(),tcx);
+    public StatisticManager(Context context, String key){
+        this(context,"", key);
     }
 
-    public StatisticManager(Context context, String url){
-        this(context, url,null);
-    }
-    public StatisticManager(Context context, String url, TCX tcx){
+    public StatisticManager(Context context, @NonNull String url,@NonNull String key){
+        StatisticConfig config = context.getApplicationContext().getClass().getAnnotation(StatisticConfig.class);
+        if(config==null && url.isEmpty() && key.isEmpty()){
+            throw new NoConfigurationException();
+        }else if(config != null && config.url().isEmpty() && url.isEmpty()){
+            throw new NoConfigurationException();
+        }else if(config != null && config.key().isEmpty() && key.isEmpty()){
+            throw new NoConfigurationException();
+        }
+
+        if(!url.isEmpty()) this.url = url;
+        else if(config!=null) this.url = config.url();
+        if(!key.isEmpty()) this.key = key;
+        else if(config!=null) this.key = config.key();
+
         this.context = context;
-        this.tcx = tcx;
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(3, TimeUnit.SECONDS)
                 .readTimeout(3, TimeUnit.SECONDS)
                 .writeTimeout(3, TimeUnit.SECONDS)
                 .callTimeout(3, TimeUnit.SECONDS)
-                .addInterceptor(TCXInterceptor.create(tcx))
+                .addInterceptor((chain)->{
+                    Request req = chain.request();
+                    Request.Builder reqBuilder = req.newBuilder()
+                            .addHeader("Authorization", "Basic "+ CryptoDriver.Base64.encode((this.key+":").getBytes()));
+                    okhttp3.Response res = chain.proceed(reqBuilder.build());
+                    if(res.body()!=null) Log.v("StatisticManager:", "Response: "+res.body().string());
+                    return res.newBuilder().build();
+                })
                 .build();
 
         apis = new Retrofit.Builder()
-                .baseUrl(url)
+                .baseUrl(this.url)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build();
     }
 
     public static StatisticManager with(Context context){
-        return with(context,(TCX)null);
+        return with(context,"");
     }
 
-    public static StatisticManager with(Context context, String url){
-        return with(context,url,null);
+    public static StatisticManager with(Context context, String key){
+        return with(context,"",key);
     }
 
-    public static StatisticManager with(Context context, TCX tcx){
-        return new StatisticManager(context, tcx);
-    }
-
-    public static StatisticManager with(Context context, String url, TCX tcx){
-        return new StatisticManager(context, url, tcx);
+    public static StatisticManager with(Context context, String url, String key){
+        return new StatisticManager(context, url, key);
     }
 
     private EventListener listener;
@@ -129,61 +136,46 @@ public class StatisticManager {
         }catch (Exception e){}
     }
     public <D extends BaseData> void send(D data){
-        send(data,HIT,null);
-    }
-    public <D extends BaseData> void send(D data, int flags){
-        send(data,flags,null);
+        send(data,null);
     }
     @SuppressWarnings("unchecked")
-    public <D extends BaseData> void send(final D data, final int flags, final OnSend callback){
+    public <D extends BaseData> void send(final D data, final OnSend callback){
         if(callback!=null)callback.onPrepare(data);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
-                StatisticDriver.with(context).attach(data);
-                StatisticAPI statisticAPI = apis.create(StatisticAPI.class);
-                Call<GeneralApiReceiver> call;
-                switch (flags){
-                    case HIT_BULK:{
-                        call = statisticAPI.hitBulk((HitData) data);
-                    }break;
-                    case HIT_CONTENT:{
-                        call = statisticAPI.content((ContentData) data);
-                    }break;
-                    case HIT_CONTENT_BULK:{
-                        call = statisticAPI.contentBulk((ContentData) data);
-                    }break;
-                    case HIT_EVENT:{
-                        call = statisticAPI.event((EventData)data);
-                    }break;
-                    case HIT_EVENT_BULK:{
-                        call = statisticAPI.eventBulk((EventData)data);
-                    }break;
-                    default: call = statisticAPI.hit((HitData)data);
-                }
-                call.enqueue(new Callback<GeneralApiReceiver>() {
-                    @Override
-                    public void onResponse(Call<GeneralApiReceiver> call, Response<GeneralApiReceiver> response) {
-                        if(response.code()==200){
-                            if(response.body()!=null){
-                                if(listener!=null)listener.onResponse(response.body());
-                            }else{
-                                if(listener!=null)listener.onFailed();
-                            }
-                        }else {
-                            if (listener != null) listener.onFailed();
-                        }
-                        if(callback!=null)callback.onSent(data);
-                    }
-
-                    @Override
-                    public void onFailure(Call<GeneralApiReceiver> call, Throwable t) {
-                        if(listener!=null)listener.onFailed();
-                        if(callback!=null)callback.onFail(data);
-                    }
-                });
+        new Thread(()->{
+            Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
+            StatisticDriver.with(context).attach(data);
+            StatisticAPI statisticAPI = apis.create(StatisticAPI.class);
+            Call<GeneralApiReceiver> call;
+            if (data instanceof HitData) {
+                call = statisticAPI.hit((HitData)data);
+            }else if(data instanceof ContentData){
+                call = statisticAPI.content((ContentData) data);
+            }else if(data instanceof EventData){
+                call = statisticAPI.event((EventData)data);
+            }else{
+                throw new InvalidDataException();
             }
+            call.enqueue(new Callback<GeneralApiReceiver>() {
+                @Override
+                public void onResponse(Call<GeneralApiReceiver> call, Response<GeneralApiReceiver> response) {
+                    if(response.code()==200){
+                        if(response.body()!=null){
+                            if(listener!=null)listener.onResponse(response.body());
+                        }else{
+                            if(listener!=null)listener.onFailed();
+                        }
+                    }else {
+                        if (listener != null) listener.onFailed();
+                    }
+                    if(callback!=null)callback.onSent(data);
+                }
+
+                @Override
+                public void onFailure(Call<GeneralApiReceiver> call, Throwable t) {
+                    if(listener!=null)listener.onFailed();
+                    if(callback!=null)callback.onFail(data);
+                }
+            });
         }).start();
     }
 
@@ -202,7 +194,7 @@ public class StatisticManager {
         return session;
     }
     public static void startSession(){
-        session = StatisticUtility.randomString(26)+ DateTime.now().toString("yMMddHHmmss");
+        session = KUtility.randomString(26)+ DateTime.now().toString("yMMddHHmmss");
     }
 
     public static void setSession(String session) {

@@ -45,29 +45,34 @@ public class EventProvider extends Provider<EventData, EventProvider> {
         return this;
     }
 
-    public EventProvider setSuccess() {
-        return setSuccess(true);
+    public EventProvider setOk() {
+        return setOk(1);
     }
 
-    public EventProvider setSuccess(boolean success) {
-        data.isSuccess = success;
+    public EventProvider setOk(int ok) {
+        data.isOk = ok;
         return this;
     }
 
-    public EventProvider setRejectionCode(String code) {
-        data.rejectionCode = code;
+    public EventProvider setStatus(String status) {
+        data.status = status;
         return this;
     }
 
-    public EventProvider setRejectionMessage(String message) {
-        data.rejectionMessage = message;
+    public EventProvider setStatusCode(String code) {
+        data.statusCode = code;
+        return this;
+    }
+
+    public EventProvider setStatusMessage(String message) {
+        data.statusMessage = message;
         return this;
     }
     @Override
     public void send() {
-        if(data.data.size()==0) StatisticManager.getInstance().send(data, StatisticManager.HIT_EVENT);
+        if(data.data.size()==0) StatisticManager.getInstance().send(data);
         else{
-            StatisticManager.getInstance().send(data, StatisticManager.HIT_EVENT_BULK, new OnSend<EventData>(){
+            StatisticManager.getInstance().send(data, new OnSend<EventData>(){
                 @Override
                 public void onPrepare(EventData data) {
 

@@ -48,9 +48,9 @@ public class ContentProvider extends Provider<ContentData, ContentProvider> {
 
     @Override
     public void send() {
-        if(data.data.size()==0) StatisticManager.getInstance().send(data, StatisticManager.HIT_CONTENT);
+        if(data.data.size()==0) StatisticManager.getInstance().send(data);
         else{
-            StatisticManager.getInstance().send(data, StatisticManager.HIT_CONTENT_BULK, new OnSend<ContentData>(){
+            StatisticManager.getInstance().send(data, new OnSend<ContentData>(){
                 @Override
                 public void onPrepare(ContentData data) {
 

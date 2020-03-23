@@ -2,7 +2,7 @@ package com.amandjaja.statistic;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.amandjaja.statistic.data.BaseData;
 
@@ -13,9 +13,9 @@ import com.amandjaja.statistic.data.BaseData;
 public abstract class Provider<A extends BaseData, B extends Provider> {
     protected A data;
     private Handler handler;
-    private static final int TOTAL_TIMEOUT = 10000;
+    private static final int TOTAL_TIMEOUT = 3000;
     private boolean isTimeout, isTotal;
-    private int timeout=5000,total=10;
+    private int timeout=1000,total=5;
 
     public Provider(A data) {
         this.data = data;

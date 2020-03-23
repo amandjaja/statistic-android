@@ -7,14 +7,16 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class EventData extends BaseData {
-    @SerializedName("id")
+    @SerializedName("cid")
     public String ID;
     public String category;
     public String name;
     public String type;
-    public Boolean isSuccess;
-    @SerializedName("rejection_code")
-    public String rejectionCode;
-    @SerializedName("rejection_message")
-    public String rejectionMessage;
+    @SerializedName("isOk")
+    public Integer isOk;
+    public String status;
+    @SerializedName("status_code")
+    public String statusCode;
+    @SerializedName("status_message")
+    public String statusMessage;
 }

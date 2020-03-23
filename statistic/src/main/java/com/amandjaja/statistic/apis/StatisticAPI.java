@@ -6,6 +6,7 @@ import com.amandjaja.statistic.apis.receivers.GeneralApiReceiver;
 import com.amandjaja.statistic.data.HitData;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
 /**
@@ -13,16 +14,13 @@ import retrofit2.http.POST;
  */
 
 public interface StatisticAPI {
+    @Headers("Content-Type: application/json")
     @POST("hit")
     Call<GeneralApiReceiver> hit(@Body HitData params);
-    @POST("hit")
-    Call<GeneralApiReceiver> hitBulk(@Body HitData params);
+    @Headers("Content-Type: application/json")
     @POST("content")
     Call<GeneralApiReceiver> content(@Body ContentData params);
-    @POST("content/bulk")
-    Call<GeneralApiReceiver> contentBulk(@Body ContentData params);
+    @Headers("Content-Type: application/json")
     @POST("event")
     Call<GeneralApiReceiver> event(@Body EventData params);
-    @POST("event/bulk")
-    Call<GeneralApiReceiver> eventBulk(@Body EventData params);
 }
