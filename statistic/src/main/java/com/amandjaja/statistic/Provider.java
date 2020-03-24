@@ -57,6 +57,11 @@ public abstract class Provider<A extends BaseData, B extends Provider> {
         return (B)this;
     }
 
+    public B putCustom(@NonNull String name, Object value){
+        data.attributes.put(name, value);
+        return (B) this;
+    }
+
     public B putCustom(@NonNull String name, String value) {
         data.attributes.put(name,value);
         return (B) this;
