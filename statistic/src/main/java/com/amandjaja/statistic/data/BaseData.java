@@ -39,6 +39,8 @@ public abstract class BaseData {
     public String userId;
 
     public String carrier;
+    @SerializedName("device_id")
+    public String deviceID;
     public Map<String,Object> device;
     private Double latitude;
     private Double longitude;

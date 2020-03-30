@@ -12,8 +12,6 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import com.amandjaja.statistic.data.BaseData;
 
-import java.util.UUID;
-
 import id.kiosku.utils.DeviceDriver;
 import id.kiosku.utils.KUtility;
 import id.kiosku.utils.LocationDriver;
@@ -57,8 +55,8 @@ public class StatisticDriver{
                 data.location.put("country_code", LocationDriver.getInstance().getAddress(LocationDriver.AddressType.COUNTRY_CODE));
             }
             if(context.checkCallingOrSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)
-                data.device.put("id", deviceDriver.getID());
-            else data.device.put("id", deviceDriver.getAndroidID());
+                data.deviceID = deviceDriver.getID();
+            else data.deviceID = deviceDriver.getAndroidID();
             data.device.put("brand", Build.BRAND);
             data.device.put("type", Build.MODEL);
             data.device.put("version", String.valueOf(Build.VERSION.SDK_INT));
