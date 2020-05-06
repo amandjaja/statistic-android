@@ -7,7 +7,8 @@ import com.amandjaja.statistic.StatisticManager;
 import id.kiosku.utils.LocationDriver;
 
 @StatisticConfig(
-        url = "HOST"
+        url = "HOST",
+        key = "KEY"
 )
 public class BaseApplication extends Application {
     @Override
