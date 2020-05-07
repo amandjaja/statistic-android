@@ -2,7 +2,6 @@ package com.amandjaja.statistic;
 
 import android.os.Handler;
 import android.os.Looper;
-import androidx.annotation.NonNull;
 
 import com.amandjaja.statistic.data.BaseData;
 
@@ -57,37 +56,37 @@ public abstract class Provider<A extends BaseData, B extends Provider> {
         return (B)this;
     }
 
-    public B putCustom(@NonNull String name, Object value){
+    public B putCustom(String name, Object value){
         data.attributes.put(name, value);
         return (B) this;
     }
 
-    public B putCustom(@NonNull String name, String value) {
+    public B putCustom(String name, String value) {
         data.attributes.put(name,value);
         return (B) this;
     }
 
-    public B putCustom(@NonNull String name, int value) {
+    public B putCustom(String name, int value) {
         return putCustom(name, String.valueOf(value));
     }
 
-    public B putCustom(@NonNull String name, long value) {
+    public B putCustom(String name, long value) {
         return putCustom(name, String.valueOf(value));
     }
 
-    public B putCustom(@NonNull String name, short value) {
+    public B putCustom(String name, short value) {
         return putCustom(name, String.valueOf(value));
     }
 
-    public B putCustom(@NonNull String name, float value) {
+    public B putCustom(String name, float value) {
         return putCustom(name, String.valueOf(value));
     }
 
-    public B putCustom(@NonNull String name, double value) {
+    public B putCustom(String name, double value) {
         return putCustom(name, String.valueOf(value));
     }
 
-    public B putCustom(@NonNull String name, char value) {
+    public B putCustom(String name, char value) {
         return putCustom(name, String.valueOf(value));
     }
 

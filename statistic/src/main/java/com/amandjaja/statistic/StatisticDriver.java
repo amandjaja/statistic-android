@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import androidx.annotation.NonNull;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -36,7 +35,7 @@ public class StatisticDriver{
         return new StatisticDriver(context);
     }
 
-    public <A extends BaseData> A attach(@NonNull final A data){
+    public <A extends BaseData> A attach(final A data){
         try {
             DeviceDriver deviceDriver = DeviceDriver.with(context);
 

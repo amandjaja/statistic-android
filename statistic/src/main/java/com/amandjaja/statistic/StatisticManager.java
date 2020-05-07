@@ -3,8 +3,6 @@ package com.amandjaja.statistic;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.amandjaja.statistic.apis.StatisticAPI;
 import com.amandjaja.statistic.apis.receivers.GeneralApiReceiver;
 import com.amandjaja.statistic.data.BaseData;
@@ -58,7 +56,7 @@ public class StatisticManager {
         this(context,"", key);
     }
 
-    public StatisticManager(Context context, @NonNull String url,@NonNull String key){
+    public StatisticManager(Context context,String url,String key){
         StatisticConfig config = context.getApplicationContext().getClass().getAnnotation(StatisticConfig.class);
         if(config==null && url.isEmpty() && key.isEmpty()){
             throw new NoConfigurationException();
